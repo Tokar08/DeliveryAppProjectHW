@@ -1,0 +1,23 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <form method="post" class="form">
+        <input type="text" asp-for="Message"/>
+        <input type="submit" value="Send" class="btn btn-primary"/>
+    </form>
+</div>
+
+<br/>
+<br/>
+<br/>
+
+<div class="text-center">
+    @foreach(var message in Model.Answers)
+    {
+        <h3>@message</h3>
+    }
+</div>
