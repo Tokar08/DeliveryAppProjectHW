@@ -4,20 +4,18 @@
     ViewData["Title"] = "Home page";
 }
 
-<div class="text-center">
-    <form method="post" class="form">
-        <input type="text" asp-for="Message"/>
-        <input type="submit" value="Send" class="btn btn-primary"/>
+@foreach (var product in Model.Products)
+{
+    <div>
+        <img alt="picture" src="@product.Url" width="200" height="150" />
+        <h3>@product.Name</h3>
+        <p>@product.Description</p>
+        <p style="color:crimson;">@product.Price</p>
+    </div>
+    <form method="post">
+        <input name="key" value="@product.RowKey" type="hidden"/>
+        <input type="submit" value="Order" class="btn btn-success"/>
     </form>
-</div>
-
-<br/>
-<br/>
-<br/>
-
-<div class="text-center">
-    @foreach(var message in Model.Answers)
-    {
-        <h3>@message</h3>
-    }
-</div>
+    <br/>
+    <br/>
+}

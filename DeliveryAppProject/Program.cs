@@ -1,7 +1,19 @@
+using DeliveryApp.Core.Interfaces;
+using DeliveryApp.Core.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+
+builder.Services.AddTransient<INavigationService>(_ =>
+{
+    return new ServiceBusQueue(builder.Configuration.GetConnectionString("ServiceBus")!);
+});
+builder.Services.AddTransient<IProductService>(_ =>
+{
+    return new ProductService(builder.Configuration.GetConnectionString("Storage")!);
+});
 
 var app = builder.Build();
 

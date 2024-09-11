@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34511.84
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeliveryAppProject", "DeliveryAppProject\DeliveryAppProject.csproj", "{5364F874-02BE-4DDD-8999-9714733B8146}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeliveryAppProject", "DeliveryAppProject\DeliveryAppProject.csproj", "{5364F874-02BE-4DDD-8999-9714733B8146}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeliveryAppClient", "DeliveryAppClient\DeliveryAppClient.csproj", "{DF29B2A4-6895-45AE-924B-255E9F11D292}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeliveryAppClient", "DeliveryAppClient\DeliveryAppClient.csproj", "{DF29B2A4-6895-45AE-924B-255E9F11D292}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeliveryApp.Core", "DeliveryApp.Core\DeliveryApp.Core.csproj", "{B17E035B-567E-4564-8BAB-B3314E629BD8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeliveryApp.Core", "DeliveryApp.Core\DeliveryApp.Core.csproj", "{B17E035B-567E-4564-8BAB-B3314E629BD8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

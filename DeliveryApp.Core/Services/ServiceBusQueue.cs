@@ -1,5 +1,6 @@
 ﻿using Azure.Messaging.ServiceBus;
 using Azure.Messaging.ServiceBus.Administration;
+using DeliveryApp.Core.Interfaces;
 using System.Text;
 
 namespace DeliveryApp.Core.Services;
@@ -7,14 +8,14 @@ namespace DeliveryApp.Core.Services;
 /// <summary>
 /// Клас для роботи з повідомленнями
 /// </summary>
-public class ServiceBusQueue
+public class ServiceBusQueue : INavigationService, IAsyncDisposable
 {
     private readonly ServiceBusClient _client; 
     private readonly ServiceBusAdministrationClient _administrationClient;
     private readonly ServiceBusProcessor? _processor = null;
     private readonly string _queueName = "deliveryqueue";
 
-    public ServiceBusQueue(string connectionString)
+    public ServiceBusQueue(string connectionString) // ServiceBusQueue(IConfiguration configuration)
     {
         _client = new ServiceBusClient(connectionString, new ServiceBusClientOptions()
         {
@@ -38,16 +39,19 @@ public class ServiceBusQueue
         {
             Body = BinaryData.FromString(message),
         });
+
+        await queue.DisposeAsync();
     }
 
-    public async Task<IEnumerable<string>> ReceiveMessagesAsync()
+    public async Task<IEnumerable<string>> ReceiveMassagesAsync()
     {
         var queue = _client.CreateReceiver(_queueName, new ServiceBusReceiverOptions()
         {
             ReceiveMode = ServiceBusReceiveMode.PeekLock,
         });
 
-        var messages = await queue.ReceiveMessagesAsync(10);
+        var messages = await queue.PeekMessagesAsync(10);
+        //var messages = await queue.ReceiveMessagesAsync(10, maxWaitTime: TimeSpan.FromSeconds(10));
 
         var list = new List<string>();
 
@@ -55,6 +59,8 @@ public class ServiceBusQueue
         {
             list.Add(Encoding.UTF8.GetString(message.Body));
         }
+
+        await queue.DisposeAsync();
 
         return list;
     }
@@ -72,5 +78,10 @@ public class ServiceBusQueue
         processor.ProcessMessageAsync += processMessage;
 
         await processor.StartProcessingAsync();
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        return _client.DisposeAsync();
     }
 }

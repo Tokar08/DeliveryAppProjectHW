@@ -1,44 +1,43 @@
+using DeliveryApp.Core.Interfaces;
+using DeliveryApp.Core.Models;
 using DeliveryApp.Core.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.Json;
 
 namespace DeliveryAppClient.Pages
 {
     public class IndexModel : PageModel
     {
         private readonly ILogger<IndexModel> _logger;
-        private readonly ServiceBusQueue _serviceBusQueue;
+        private readonly INavigationService _navigationService;
+        private readonly IProductService _productService;
 
-        public IndexModel(ILogger<IndexModel> logger)
+        public IndexModel(ILogger<IndexModel> logger, INavigationService navigationService, IProductService productService)
         {
             _logger = logger;
-            _serviceBusQueue = new ServiceBusQueue("");
-            Answers = new List<string>();
+            _navigationService = navigationService;
+            _productService = productService;
+            Products = new List<Product>(_productService.GetProducts());
         }
 
-        public async Task OnGet()
-        {
-            this.Answers = new List<string>(await _serviceBusQueue.ReceiveMessagesAsync());
-            /*await _serviceBusQueue.SetupProcessor(
-                args => {
-                    RedirectToPage("Error");
-                    return Task.CompletedTask;
-                },
-                msg => {
-                    //RedirectToPage("Index");
-                    return msg.CompleteMessageAsync(msg.Message);
-                });*/
-        }
 
         [BindProperty]
         public string Message { get; set; }
 
-        public List<string> Answers { get; set; }
+        public List<Product> Products { get; set; }
 
-        public async Task OnPostAsync()
+        public async Task OnPostAsync(string key)
         {
-            await _serviceBusQueue.SendMessageAsync(Message);
+            Order order = new Order()
+            {
+                ProductRowKey = key,
+                Email = ""
+            };
+
+            await _navigationService.SendMessageAsync(JsonSerializer.Serialize(order));
         }
     }
 }

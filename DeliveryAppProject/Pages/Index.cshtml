@@ -4,7 +4,13 @@
     ViewData["Title"] = "Home page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+@foreach(var product in Model.Products){
+    <div>
+        <img alt="picture" src="@product.Url" width="200" height="150"/>
+        <h3>@product.Name</h3>
+        <p>@product.Description</p>
+        <p style="color:crimson;">@product.Price</p>
+    </div>
+    <br/>
+    <br/>
+}

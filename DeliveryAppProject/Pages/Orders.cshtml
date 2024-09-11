@@ -1,0 +1,13 @@
+﻿@page
+@model DeliveryAppProject.Pages.OrdersModel
+@{
+}
+
+@foreach(var order in Model.Orders){
+    <div>
+        <img alt="picture" src="@order.Image" width="200" height="150" />
+        <h3>@order.Name</h3>
+        <p>@order.Email</p>
+        <p style="color:crimson;">@order.Price</p>
+    </div>
+}
