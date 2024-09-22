@@ -2,40 +2,45 @@
 @model OrderModel
 
 @{
-    ViewData["Title"] = "Submit Order";
+    ViewData["Title"] = "Place Your Order";
 }
 
-<h2 class="text-center my-4">Submit Your Order</h2>
+<h2 class="text-center my-4">Order Form</h2>
 
-<div class="order-form-container">
-    <form method="post">
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <form method="post">
+                        <div class="mb-3">
+                            <label for="productName" class="form-label">Product Name:</label>
+                            <input type="text" class="form-control" id="productName" name="ProductName" value="@Model.Name" readonly />
+                        </div>
 
-        <div class="form-group">
-            <label for="orderName">Order Name:</label>
-            <input type="text" class="form-control" id="orderName" name="OrderName" value="@Model.Name" readonly />
+                        <div class="mb-3">
+                            <label for="productDescription" class="form-label">Product Description:</label>
+                            <textarea class="form-control" id="productDescription" name="ProductDescription" rows="4" readonly>@Model.Description</textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="productPrice" class="form-label">Price:</label>
+                            <input type="text" class="form-control" id="productPrice" name="ProductPrice" value="@Model.Price" readonly />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Your Email:</label>
+                            <input type="email" class="form-control" id="email" name="Email" placeholder="Your email address" required />
+                        </div>
+
+                        <input type="hidden" name="ProductKey" value="@Model.ProductKey" />
+
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary">Confirm Order</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-
-        <div class="form-group">
-            <label for="description">Description:</label>
-            <textarea class="form-control" id="description" name="Description" rows="3" readonly>@Model.Description</textarea>
-        </div>
-
-        <div class="form-group">
-            <label for="price">Price:</label>
-            <input type="number" class="form-control" id="price" name="Price" value="@Model.Price" readonly />
-        </div>
-
-        <div class="form-group">
-            <label for="userEmail">User Email:</label>
-            <input type="email" class="form-control" id="userEmail" name="userEmail" placeholder="Enter your email" required />
-        </div>
-
-        <div class="form-group">
-            <input type="hidden" name="ProductKey" value="@Model.ProductKey" />
-        </div>
-
-        <div class="form-group text-center">
-            <input type="submit" value="Submit Order" class="btn btn-primary mt-4" />
-        </div>
-    </form>
+    </div>
 </div>

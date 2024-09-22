@@ -1,7 +1,5 @@
 using DeliveryApp.Core.Interfaces;
 using DeliveryApp.Core.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Text.Json;
 
@@ -9,32 +7,48 @@ namespace DeliveryAppProject.Pages
 {
     public class OrdersModel : PageModel
     {
-        private readonly INavigationService _navigationService;
-        private readonly IProductService _productService;
+        private readonly INavigationService _navService;
+        private readonly IProductService _prodService;
+        private readonly ILogger<OrdersModel> _logger;
 
-        public OrdersModel(INavigationService navigationService, IProductService productService)
+        public OrdersModel(INavigationService navService, IProductService prodService, ILogger<OrdersModel> logger)
         {
-            _navigationService = navigationService;
-            _productService = productService;
+            _navService = navService;
+            _prodService = prodService;
+            _logger = logger;
         }
 
-        public List<OrderDTO> Orders { get; set; }
+        public List<OrderDTO> Orders { get; set; } = new();
 
         public async Task OnGet()
         {
-            var products = _productService.GetProducts();
-            var ordersJson = await _navigationService.ReceiveMassagesAsync();
-            var orders = ordersJson.Select(x => JsonSerializer.Deserialize<Order>(x)!).ToList();
-            Orders = orders.Select(x => {
-                var product = products.First(y => y.RowKey.Equals(x.ProductRowKey));
-                return new OrderDTO()
+            try
+            {
+                var products = _prodService.GetProducts();
+                var ordersJson = await _navService.ReceiveMassagesAsync();
+                var orders = ordersJson.Select(x => JsonSerializer.Deserialize<Order>(x)).ToList();
+
+                if (orders == null || !orders.Any())
                 {
-                    Name = product.Name,
-                    Email = x.Email,
-                    Price = product.Price,
-                    Image = product.Url,
-                };
-            }).ToList();
+                    return;
+                }
+
+                Orders = orders.Select(order =>
+                {
+                    var product = products.FirstOrDefault(p => p.RowKey.Equals(order?.ProductRowKey));
+                    return new OrderDTO
+                    {
+                        Name = product?.Name ?? "Unknown Product",
+                        Email = order?.Email ?? "Unknown Email",
+                        Price = product?.Price ?? 0,
+                        Image = product?.Url ?? ""
+                    };
+                }).ToList();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while fetching orders");
+            }
         }
     }
 }

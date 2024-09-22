@@ -1,41 +1,58 @@
 ﻿using Azure.Data.Tables;
 using DeliveryApp.Core.Interfaces;
 using DeliveryApp.Core.Models;
-using System.Net.Http.Headers;
+using Microsoft.Extensions.Logging;
 
-namespace DeliveryApp.Core.Services;
-
-public class ProductService : IProductService
+namespace DeliveryApp.Core.Services
 {
-    private readonly TableServiceClient _tableServiceClient;
-    private readonly TableClient _tableClient;
-    private readonly string _tableName = "products";
-    private readonly BlobService _blobService;
-
-    public ProductService(string connectionString)
+    public class ProductService : IProductService
     {
-        _tableServiceClient = new TableServiceClient(connectionString);
-        _tableClient = _tableServiceClient.GetTableClient(_tableName);
-        _tableClient.CreateIfNotExists();
-        _blobService = new BlobService(connectionString);
-    }
+        private readonly TableClient _tableClient;
+        private readonly BlobService _blobService;
+        private readonly ILogger<ProductService> _logger;
+        private const string TableName = "products";
 
-    public async Task AddProduct(Product product, IEnumerable<byte> bytes)
-    {
-        var (uniqueName, sas) = await _blobService.AddBlob(product.Image, bytes);
-        product.Image = uniqueName;
-        product.Url = sas;
-        await _tableClient.AddEntityAsync(product);
-    }
+        public ProductService(string connectionString, ILogger<ProductService> logger, BlobService blobService)
+        {
+            var tableServiceClient = new TableServiceClient(connectionString);
+            _tableClient = tableServiceClient.GetTableClient(TableName);
+            _tableClient.CreateIfNotExists();
+            _blobService = blobService;
+            _logger = logger;
+        }
 
-    public IEnumerable<Product> GetProducts()
-    {
-        var response = _tableClient.Query<Product>(x => x.PartitionKey.Equals(nameof(Product)));
-        return response.ToList();
-    }
+        public async Task AddProduct(Product product, IEnumerable<byte> bytes)
+        {
+            try
+            {
+                var blobUrl = await _blobService.AddBlob(product.Image, bytes);
+                product.Image = blobUrl;
+                product.Url = blobUrl;
+                await _tableClient.AddEntityAsync(product);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while adding product {ProductName}", product.Name);
+                throw;
+            }
+        }
 
-    public Task OrderProduct(string rowKey, string email)
-    {
-        throw new NotImplementedException();
+        public IEnumerable<Product> GetProducts()
+        {
+            try
+            {
+                return _tableClient.Query<Product>(x => x.PartitionKey.Equals(nameof(Product))).ToList();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while retrieving products");
+                throw;
+            }
+        }
+
+        public Task OrderProduct(string rowKey, string email)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

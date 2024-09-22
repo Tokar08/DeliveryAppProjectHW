@@ -4,18 +4,74 @@
     ViewData["Title"] = "Home page";
 }
 
-@foreach (var product in Model.Products)
-{
-    <div>
-        <img alt="picture" src="@product.Url" width="200" height="150" />
-        <h3>@product.Name</h3>
-        <p>@product.Description</p>
-        <p style="color:crimson;">@product.Price</p>
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
+
+    .card {
+        background-color: #ffffff;
+        color: #343a40;
+        border: 1px solid #343a40;
+        border-radius: 10px;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+     .card:hover {
+         transform: scale(1.05);
+         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+     }
+
+     .card h5, .card p {
+         color: #343a40;
+     }
+
+     .card img {
+         border-bottom: 2px solid #000;
+     }
+
+    .text-danger {
+        color: red !important; 
+    }
+
+     .btn-success {
+        background-color: #28a745;
+        border-color: #28a745;
+     }
+
+     .btn-success:hover {
+        background-color: #218838;
+         border-color: #1e7e34;
+     }
+</style>
+
+<h1 class="text-center my-4">Product List</h1>
+
+<div class="container">
+    <div class="row">
+        @foreach (var product in Model.Products)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-sm h-100">
+                    <img class="card-img-top" alt="picture" src="@product.Url" style="height: 250px; object-fit: cover;" />
+                    <div class="card-body">
+                        <label for="name-@product.RowKey" style="text-decoration: underline;">Name:</label>
+                        <h5 id="name-@product.RowKey" class="card-title">@product.Name</h5>
+
+                        <label for="description-@product.RowKey" style="text-decoration: underline;">Description:</label>
+                        <p id="description-@product.RowKey" class="card-text">@product.Description</p>
+
+                        <label for="price-@product.RowKey" style="text-decoration: underline;">Price:</label>
+                        <h3 id="price-@product.RowKey" class="text-danger font-weight-bold">@product.Price</h3>
+
+                        <form method="get" asp-page="/Order" asp-route-name="@product.Name" asp-route-description="@product.Description" asp-route-price="@product.Price" asp-route-key="@product.RowKey">
+                            <div class="text-center">
+                                <input type="submit" value="Order" class="btn btn-success" />
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
     </div>
-    <form method="post">
-        <input name="key" value="@product.RowKey" type="hidden"/>
-        <input type="submit" value="Order" class="btn btn-success"/>
-    </form>
-    <br/>
-    <br/>
-}
+</div>
